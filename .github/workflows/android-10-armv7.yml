@@ -34,8 +34,7 @@ jobs:
             exit 1
           fi
 
-          SDK_DIR=$(dirname "$SDKMANAGER")
-          echo "$SDK_DIR" >> "$GITHUB_PATH"
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
 
       - name: Check Android SDK
         run: |
@@ -46,9 +45,13 @@ jobs:
         run: |
           yes | sdkmanager --licenses || true
 
+      - name: Show available Android packages
+        run: |
+          sdkmanager --list | grep -E "platforms;android-[0-9]+|build-tools;[0-9]" | head -40
+
       - name: Install Android SDK
         run: |
-          sdkmanager             "platform-tools"             "platforms;android-37"             "build-tools;37.0.0"             "ndk;27.2.12479018"
+          sdkmanager             "platform-tools"             "build-tools;35.0.0"             "ndk;27.2.12479018"
 
       - name: Verify Android SDK
         run: |
