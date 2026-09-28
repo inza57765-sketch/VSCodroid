@@ -1,0 +1,22 @@
+diff --git a/build/gulpfile.reh.ts b/build/gulpfile.reh.ts
+index a40ff6f6..24767402 100644
+--- a/build/gulpfile.reh.ts
++++ b/build/gulpfile.reh.ts
+@@ -51,6 +51,7 @@ const BUILD_TARGETS = [
+ 	{ platform: 'darwin', arch: 'arm64' },
+ 	{ platform: 'linux', arch: 'x64' },
+ 	{ platform: 'linux', arch: 'arm64' },
++        { platform: 'linux', arch: 'arm' },
+ 	{ platform: 'alpine', arch: 'arm64' },
+ 	// legacy: we use to ship only one alpine so it was put in the arch, but now we ship
+ 	// multiple alpine images and moved to a better model (alpine as the platform)
+@@ -271,6 +272,9 @@ if (defaultNodeTask) {
+ }
+ 
+ function nodejs(platform: string, arch: string): NodeJS.ReadWriteStream | undefined {
++	if (platform === 'linux' && arch === 'arm') {
++		arch = 'armv7l';
++	}
+ 
+ 	if (arch === 'alpine') {
+ 		platform = 'alpine';
