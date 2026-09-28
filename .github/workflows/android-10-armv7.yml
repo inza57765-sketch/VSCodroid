@@ -1,6 +1,8 @@
-name: Android 10 ARMv7
-
 on:
+  push:
+    branches:
+      - android-10-armv7
+
   workflow_dispatch:
 
 jobs:
