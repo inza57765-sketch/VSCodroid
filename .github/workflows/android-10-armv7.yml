@@ -1,8 +1,6 @@
-on:
-  push:
-    branches:
-      - android-10-armv7
+name: Android 10 ARMv7
 
+on:
   workflow_dispatch:
 
 jobs:
@@ -23,13 +21,18 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           accept-android-sdk-licenses: false
+          packages: ""
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
       - name: Install Android SDK
         run: |
-          sdkmanager "platform-tools" "platforms;android-37" "build-tools;37.0.0" "ndk;27.2.12479018"
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-37" \
+            "build-tools;37.0.0" \
+            "ndk;27.2.12479018"
 
       - name: Make Gradle executable
         run: chmod +x android/gradlew
