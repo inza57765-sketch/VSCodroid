@@ -112,7 +112,7 @@ android {
     // Compile against the newest platform, which the androidx libraries this app
     // uses now require. Compile-time only: what the platform applies to a running
     // app is decided by targetSdk below, and that is deliberately not moved here.
-    compileSdk = 37
+    compileSdk = 36
 
     signingConfigs {
         create("release") {
