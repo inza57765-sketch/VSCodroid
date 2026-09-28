@@ -6,7 +6,7 @@ set -euo pipefail
 #
 #   ANDROID_NDK_HOME=... ./scripts/build-exec-trampoline.sh
 #
-# Output: jniLibs/arm64-v8a/libexec-trampoline.so, an executable rather than a
+# Output: jniLibs/armeabi-v7a/libexec-trampoline.so, an executable rather than a
 # library. The `.so` name is the packaging trick the rest of this tree uses: the
 # package manager extracts jniLibs into nativeLibraryDir with the execute bit,
 # and that is the only directory this app may execve from. `usr/libexec/tcbin`
@@ -27,10 +27,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-OUT_DIR="${OUT_DIR:-$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a}"
+OUT_DIR="${OUT_DIR:-$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a}"
 OUT="$OUT_DIR/libexec-trampoline.so"
 
-TARGET=aarch64-linux-android
+TARGET=armv7a-linux-androideabi
 API=33
 
 echo "=== toolchain execution trampoline ==="

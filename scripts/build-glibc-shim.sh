@@ -11,7 +11,7 @@ set -euo pipefail
 #   libglibc-shim.so    the symbols Bionic does not have, from glibc-shim.c
 #   libc.so.6 &c        stubs carrying the names a glibc binary asks for
 #
-# A prebuilt linux-arm64 addon is machine code Android can run -- same ISA, same
+# A prebuilt linux-armhf addon is machine code Android can run -- same ISA, same
 # calling convention -- and the only thing stopping it is the loader. Its
 # DT_NEEDED names are glibc's (libc.so.6, libdl.so.2, libpthread.so.0, ...) and
 # none of them exist here, so dlopen fails before a single instruction runs.
@@ -34,13 +34,13 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 OUT_DIR="${OUT_DIR:-$ROOT_DIR/android/app/src/main/assets/usr/lib}"
 WORK_DIR="${WORK_DIR:-$ROOT_DIR/.build/glibc-shim}"
 
-TARGET=aarch64-linux-android
+TARGET=armv7a-linux-androideabi
 API=33
 
 # The names a glibc-linked binary carries in DT_NEEDED. Bionic folded all of
 # these into libc, so every stub has the same (empty) body.
 STUBS=(libc.so.6 libdl.so.2 libpthread.so.0 libm.so.6 librt.so.1 libutil.so.1
-       libgcc_s.so.1 libresolv.so.2 libcrypt.so.1 ld-linux-aarch64.so.1)
+       libgcc_s.so.1 libresolv.so.2 libcrypt.so.1 ld-linux-armhf.so.3)
 
 echo "=== glibc compatibility shim ==="
 

@@ -197,7 +197,7 @@ echo "Pointing compiled-in default shells at /system/bin/sh..."
 RUBY_LIB="$PACK_ASSETS/usr/lib/ruby/$RUBY_MINOR"
 python3 "$SCRIPT_DIR/patch-default-shell.py" \
     "$PACK_ASSETS/usr/lib/libruby.so" \
-    "$RUBY_LIB/aarch64-linux-android/pty.so" \
+    "$RUBY_LIB/arm-linux-androideabi/pty.so" \
     "$RUBY_LIB/mkmf.rb"
 
 # --- Step 5c: Place the upstream notices beside what they describe ---
@@ -252,7 +252,7 @@ cat > "$PACK_ASSETS/toolchain_ruby.json" << EOF
     "env": {
         "GEM_HOME": "\$HOME/.gem/ruby",
         "GEM_PATH": "\$HOME/.gem/ruby:\$FILESDIR/usr/lib/ruby/gems",
-        "RUBYLIB": "\$FILESDIR/usr/lib/ruby/$RUBY_MINOR:\$FILESDIR/usr/lib/ruby/$RUBY_MINOR/aarch64-linux-android"
+        "RUBYLIB": "\$FILESDIR/usr/lib/ruby/$RUBY_MINOR:\$FILESDIR/usr/lib/ruby/$RUBY_MINOR/arm-linux-androideabi"
     },
     "pathDirs": ["usr/bin"],
     "installRoot": "usr/lib/ruby",

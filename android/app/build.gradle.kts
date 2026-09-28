@@ -144,7 +144,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters += "arm64-v8a"
+            abiFilters += "armeabi-v7a"
         }
 
         // How much room first-run extraction needs is the size of the asset tree,
@@ -374,7 +374,7 @@ android {
         // WAKE_LOCK to what the installed app asks for, and the reason is written
         // beside the version in libs.versions.toml. The third is x86_64 for
         // ChromeOS, which this app cannot offer: every bundled binary, from the
-        // Node runtime to git and Python, is an arm64 build taken from Termux,
+        // Node runtime to git and Python, is an ARMv7 build taken from Termux,
         // and there is no second toolchain to ship.
         //
         // An entry naming a file above this module carries whatever path lint
@@ -871,13 +871,13 @@ val verifyNativeAddons = tasks.register<Exec>("verifyNativeAddons") {
 }
 
 /**
- * Refuses a packaged asset tree carrying an aarch64 binary the device cannot
+ * Refuses a packaged asset tree carrying an ARM binary the device cannot
  * map, or cannot start.
  *
  * The page-size rule is enforced everywhere a binary is produced and nowhere a
  * binary is packaged, for everything except `jniLibs/`. Each download script
  * checks the one file it just placed, and `verifyBundledBinaries` sweeps
- * `jniLibs/` as a directory, so the ~150 aarch64 binaries under `assets/` were
+ * `jniLibs/` as a directory, so the ~150 ARM binaries under `assets/` were
  * answered for at fetch time and never again. Three ordinary routes reach
  * packaging with no fetch having run: a cache restore in CI, a local build after
  * an old fetch, and `package-assets.sh` copying `server/vscode-reh` over the
@@ -891,7 +891,7 @@ val verifyNativeAddons = tasks.register<Exec>("verifyNativeAddons") {
  *
  * Two of the four questions the script can ask: LOAD alignment, which decides
  * whether the file maps at all on Android 16, and PT_INTERP, which decides
- * whether an aarch64 executable came out of a toolchain whose loader exists
+ * whether an ARM executable came out of a toolchain whose loader exists
  * here. DT_NEEDED is deliberately not asked. The tree is packaged
  * rather than built here, so it legitimately holds payloads for other platforms
  * and dependencies nothing loads, and asking that question of it would fail a
@@ -903,13 +903,13 @@ val verifyNativeAddons = tasks.register<Exec>("verifyNativeAddons") {
  * and unit-test jobs stub an empty assets tree so Gradle will configure, and a
  * tree that was never downloaded has nothing to judge.
  *
- * Measured on the real tree: 146 aarch64 binaries, 4 skipped as another ABI or
+ * Measured on the real tree: 146 ARM binaries, 4 skipped as another ABI or
  * not loadable, 0.8s. The count is a snapshot and moves whenever the packaged
  * tree does; only the shape is durable.
  */
 val verifyPackagedAlignment = tasks.register<Exec>("verifyPackagedAlignment") {
     group = "verification"
-    description = "Checks every packaged aarch64 binary can be mapped and started."
+    description = "Checks every packaged ARM binary can be mapped and started."
 
     val entryPoint = file("src/main/assets/vscode-reh/out/server-main.js")
 
@@ -930,7 +930,7 @@ val verifyPackagedAlignment = tasks.register<Exec>("verifyPackagedAlignment") {
             "so whatever loads it fails on a current device and works everywhere\n" +
             "older.\n" +
             "\n" +
-            "PT_INTERP: an aarch64 executable naming a program interpreter other\n" +
+            "PT_INTERP: an ARM executable naming a program interpreter other\n" +
             "than /system/bin/linker64 came out of a glibc toolchain, and nothing\n" +
             "on the device can start it. This tree is extracted to filesDir,\n" +
             "where SELinux refuses execve outright, and the loader indirection\n" +
@@ -1011,7 +1011,7 @@ val jniLibsStubCeiling = 1000L
 // answer rather than on two copies of it: a tree worth examining for one is
 // worth examining for the other, and a placeholder tree is neither's business.
 fun jniLibsHoldsRealBinary(): Boolean =
-    file("src/main/jniLibs/arm64-v8a").listFiles()
+    file("src/main/jniLibs/armeabi-v7a").listFiles()
         ?.any { it.name.endsWith(".so") && it.length() >= jniLibsStubCeiling } == true
 
 // Every binary in jniLibs, checked where it is packaged rather than only where
@@ -1045,7 +1045,7 @@ val verifyBundledBinaries = tasks.register<Exec>("verifyBundledBinaries") {
     workingDir = rootProject.projectDir.parentFile
     commandLine(
         "python3", "scripts/verify-android-elf.py",
-        "--dir", "android/app/src/main/jniLibs/arm64-v8a",
+        "--dir", "android/app/src/main/jniLibs/armeabi-v7a",
         // Both directories, matching what every installer passes -- see the
         // --lib-dir pairs in download-node.sh, download-python.sh and
         // download-termux-tools.sh. jniLibs is the second one for a reason that is
@@ -1056,7 +1056,7 @@ val verifyBundledBinaries = tasks.register<Exec>("verifyBundledBinaries") {
         // reject at packaging what the installer had just accepted -- then send
         // the developer back to re-run the script that passed.
         "--lib-dir", "android/app/src/main/assets/usr/lib",
-        "--lib-dir", "android/app/src/main/jniLibs/arm64-v8a",
+        "--lib-dir", "android/app/src/main/jniLibs/armeabi-v7a",
     )
 
     // Runs when jniLibs holds at least one real binary. Keyed on "any", not on
@@ -1167,7 +1167,7 @@ val verifyRequiredBinaries = tasks.register("verifyRequiredBinaries") {
     group = "verification"
     description = "Checks every binary the app resolves by name is in jniLibs."
 
-    val jniLibsDir = file("src/main/jniLibs/arm64-v8a")
+    val jniLibsDir = file("src/main/jniLibs/armeabi-v7a")
     val required = requiredJniLibs
     val producers = jniLibProducers
 
@@ -1216,7 +1216,7 @@ val verifyBundledShellPaths = tasks.register<Exec>("verifyBundledShellPaths") {
     workingDir = rootProject.projectDir.parentFile
     commandLine(
         "python3", "scripts/patch-default-shell.py",
-        "--check", "android/app/src/main/jniLibs/arm64-v8a",
+        "--check", "android/app/src/main/jniLibs/armeabi-v7a",
     )
 
     onlyIf { jniLibsHoldsRealBinary() }

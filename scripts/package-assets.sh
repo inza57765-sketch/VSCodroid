@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 ASSETS_DIR="$ROOT_DIR/android/app/src/main/assets"
-JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a"
 
 echo "=== Packaging Assets ==="
 

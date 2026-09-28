@@ -3,7 +3,7 @@
 
     check-binary-lists.py
 
-Two documents enumerate `jniLibs/arm64-v8a` by name: the architecture diagrams in
+Two documents enumerate `jniLibs/armeabi-v7a` by name: the architecture diagrams in
 `docs/03-ARCHITECTURE.md` and the source tree in `CONTRIBUTING.md`. Neither is
 derived from anything, so both go stale silently the moment a binary is added or
 withdrawn, and the reader they mislead is the one deciding what ships.
@@ -60,7 +60,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-JNILIBS = ROOT / "android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS = ROOT / "android/app/src/main/jniLibs/armeabi-v7a"
 
 # Both files enumerate the directory, in a mermaid node and in a tree listing.
 # Named individually rather than globbed over docs/, so a document that merely

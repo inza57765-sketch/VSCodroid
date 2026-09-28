@@ -55,7 +55,7 @@ NODE_VERSION="${NODE_VERSION:-24.18.0}"
 # version bump.
 NODE_HEADERS_SHA256="6c7d41d83c3481d2301115b8ce4a44b7d4fbfa52859b1aac14f445d460137887"
 
-TARGET=aarch64-linux-android
+TARGET=armv7a-linux-androideabi
 API=33
 
 # Android 16 requires 16 KB-aligned segments. NDK r28+ defaults to this and r27
@@ -189,7 +189,7 @@ fi
 # purpose: NODE_MODULE_VERSION, which is what actually breaks addon loading,
 # moves with the major, and a full-triple match would fail builds over a
 # harmless patch bump.
-JNILIBS="$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS="$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a"
 runtime_version=""
 if [ -f "$JNILIBS/.libnode-version" ]; then
     runtime_version=$(cat "$JNILIBS/.libnode-version")
@@ -544,7 +544,7 @@ tar xzf "$LIBZMQ_TGZ" -C "$WORK_DIR/src"
 # which CMake 4 refuses to configure; CMake 3.x ignores the variable.
 "$CMAKE" -S "$LIBZMQ_SRC" -B "$LIBZMQ_BUILD" \
     -DCMAKE_TOOLCHAIN_FILE="$NDK_DIR/build/cmake/android.toolchain.cmake" \
-    -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM="android-$API" \
+    -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM="android-$API" \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_INSTALL_PREFIX="$LIBZMQ_PREFIX" -DCMAKE_INSTALL_LIBDIR=lib \

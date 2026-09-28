@@ -8,18 +8,30 @@ on:
 
 jobs:
   build:
+    name: Build ARMv7 APK
     runs-on: ubuntu-latest
+    env:
+      TERMUX_ARCH: arm
 
     steps:
+      # --------------------------------------------------
+      # 1. Récupération du projet
+      # --------------------------------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
+      # --------------------------------------------------
+      # 2. Java
+      # --------------------------------------------------
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
+      # --------------------------------------------------
+      # 3. Android SDK + NDK
+      # --------------------------------------------------
       - name: Configure Android SDK
         run: |
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
@@ -45,19 +57,163 @@ jobs:
         run: |
           yes | sdkmanager --licenses || true
 
-      - name: Show available Android packages
+      - name: Install Android SDK and NDK
         run: |
-          sdkmanager --list | grep -E "platforms;android-[0-9]+|build-tools;[0-9]" | head -40
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-37" \
+            "build-tools;35.0.0" \
+            "ndk;27.2.12479018"
 
-      - name: Install Android SDK
+      - name: Configure NDK
         run: |
-          sdkmanager             "platform-tools"             "build-tools;35.0.0"             "ndk;27.2.12479018"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
 
-      - name: Verify Android SDK
+      - name: Verify NDK
         run: |
-          sdkmanager --list_installed
-          test -d "$ANDROID_HOME/ndk/27.2.12479018"
+          test -d "$ANDROID_NDK_HOME"
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME"
+          "$ANDROID_NDK_HOME/ndk-build" --version || true
 
+      # --------------------------------------------------
+      # 4. Dépendances système
+      # --------------------------------------------------
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libarchive-tools \
+            gnupg
+
+      # --------------------------------------------------
+      # 5. Préparation Code-OSS
+      # --------------------------------------------------
+      - name: Fetch Code - OSS server
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/fetch-vscode-oss.sh
+
+      - name: Copy the server into assets
+        run: bash scripts/package-assets.sh
+
+      - name: Build translated string bundles
+        run: python3 scripts/build-nls-bundles.py
+
+      # --------------------------------------------------
+      # 6. Runtimes / outils ARMv7
+      # --------------------------------------------------
+      - name: Download Termux tools
+        run: bash scripts/download-termux-tools.sh
+
+      - name: Download npm
+        run: bash scripts/download-npm.sh
+
+      - name: Download Python
+        run: bash scripts/download-python.sh
+
+      - name: Download extensions
+        run: bash scripts/download-extensions.sh
+
+      - name: Download musl loader
+        run: bash scripts/download-musl-loader.sh
+
+      - name: Fetch Node runtime
+        run: bash scripts/download-node.sh
+
+      # --------------------------------------------------
+      # 7. Compilation des composants natifs
+      # --------------------------------------------------
+      - name: Build native addons
+        run: bash scripts/build-native-addons.sh
+
+      - name: Build glibc compatibility shim
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+        run: |
+          bash scripts/build-glibc-shim.sh \
+            --scan android/app/src/main/assets/vscode-reh \
+            --scan android/app/src/main/assets/extensions
+
+      - name: Build execution trampoline
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+        run: bash scripts/build-exec-trampoline.sh
+
+      - name: Build Claude Code seccomp shim
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+        run: bash scripts/build-claude-shim.sh
+
+      # --------------------------------------------------
+      # 8. Vérifications des fichiers produits
+      # --------------------------------------------------
+      - name: Verify ARMv7 jniLibs
+        run: |
+          echo "=== jniLibs ARMv7 ==="
+          ls -lah android/app/src/main/jniLibs/armeabi-v7a/
+
+      - name: Verify server
+        run: |
+          server="android/app/src/main/assets/vscode-reh/out/server-main.js"
+
+          if [ ! -f "$server" ]; then
+            echo "::error::$server is missing"
+            exit 1
+          fi
+
+          echo "server-main.js present"
+
+      - name: Verify libnode
+        run: |
+          libnode="android/app/src/main/jniLibs/armeabi-v7a/libnode.so"
+
+          if [ ! -f "$libnode" ]; then
+            echo "::error::$libnode is missing"
+            exit 1
+          fi
+
+          size="$(wc -c < "$libnode")"
+
+          if [ "$size" -lt 1000 ]; then
+            echo "::error::libnode.so is only $size bytes"
+            exit 1
+          fi
+
+          echo "libnode.so present: $size bytes"
+
+      - name: Verify ARMv7 ELF binaries
+        run: |
+          python3 scripts/verify-android-elf.py \
+            --dir android/app/src/main/jniLibs/armeabi-v7a \
+            --lib-dir android/app/src/main/assets/usr/lib \
+            --lib-dir android/app/src/main/jniLibs/armeabi-v7a
+
+      # --------------------------------------------------
+      # 9. Vérifications du projet
+      # --------------------------------------------------
+      - name: Check library attribution
+        run: python3 scripts/check-library-attribution.py
+
+      - name: Check wheelhouse ABI
+        run: python3 scripts/check-wheelhouse-abi.py
+
+      - name: Check bundled extensions
+        run: python3 scripts/check-bundled-extensions.py
+
+      - name: Check binary lists
+        run: python3 scripts/check-binary-lists.py
+
+      - name: Check language server patterns
+        run: |
+          python3 scripts/check-langserver-patterns.py \
+            android/app/src/main/assets/vscode-reh/extensions
+
+      - name: Check welcome claims
+        run: python3 scripts/check-welcome-claims.py
+
+      # --------------------------------------------------
+      # 10. Build APK
+      # --------------------------------------------------
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
@@ -65,13 +221,17 @@ jobs:
         working-directory: android
         run: ./gradlew --version
 
-      - name: Build ARMv7 APK
+      - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Upload APK
+      # --------------------------------------------------
+      # 11. Upload APK
+      # --------------------------------------------------
+      - name: Upload ARMv7 APK
         uses: actions/upload-artifact@v4
         with:
           name: VSCodroid-Android10-ARMv7
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          retention-days: 14

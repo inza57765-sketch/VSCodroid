@@ -39,7 +39,7 @@ VSCODE_VERSION="${VSCODE_VERSION:-$(cat "$ROOT_DIR/VSCODE_VERSION")}"
 # version bump, so on the side that actually produces an APK it was a file
 # nothing read.
 VSCODE_COMMIT="${VSCODE_COMMIT:-$(cat "$ROOT_DIR/VSCODE_COMMIT")}"
-ARCH="${ARCH:-arm64}"
+ARCH="${ARCH:-arm}"
 REPO="${REPO:-rmyndharis/VSCodroid}"
 
 TARBALL_NAME="vscode-reh-web-linux-$ARCH-$VSCODE_VERSION.tar.gz"
@@ -462,15 +462,15 @@ echo "=== ripgrep ==="
 # filesDir is unexecutable no matter how it is chmodded; binaries have to be
 # packaged as lib*.so in jniLibs, which Android extracts into nativeLibraryDir
 # with execute permission. FirstRunSetup.kt:270-288 then symlinks
-# node_modules/@vscode/ripgrep-universal/bin/linux-arm64/rg at it, which is the
+# node_modules/@vscode/ripgrep-universal/bin/linux-arm/rg at it, which is the
 # path VS Code's search service looks for. That path moved in 1.133 -- the
 # package used to be @vscode/ripgrep with a single bin/rg.
 #
 # libripgrep.so is gitignored, so this is its only source in a clean checkout:
 # without it Search returns nothing and nothing else fails.
-JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a"
 mkdir -p "$JNILIBS_DIR"
-RG_SRC="$DEST/node_modules/@vscode/ripgrep-universal/bin/linux-arm64/rg"
+RG_SRC="$DEST/node_modules/@vscode/ripgrep-universal/bin/linux-arm/rg"
 
 # The same gate every other binary in jniLibs already gets, and this was the one
 # without it. verify-server-tree.py above reads rg's e_machine and stops there:

@@ -47,7 +47,8 @@ TERMUX_SCRIPTS_DIR="$(dirname "$TERMUX_LIB_DIR")"
 # verify-termux-index.sh anchors the index to Termux's own signature, so a
 # mirror cannot pick both the payload and the digest it is measured by.
 TERMUX_REPO="${TERMUX_MIRROR:-https://mirror.mwt.me/termux/main}"
-PACKAGES_URL="$TERMUX_REPO/dists/stable/main/binary-aarch64/Packages"
+TERMUX_ARCH="${TERMUX_ARCH:-arm}"
+PACKAGES_URL="$TERMUX_REPO/dists/stable/main/binary-${TERMUX_ARCH}/Packages"
 
 # Set by termux_resolve_packages, read by the lookups under it.
 TERMUX_RECORD_FILE=""

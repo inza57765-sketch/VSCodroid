@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Download pre-compiled bash + git (with dependencies) from Termux APT repo.
-# Places executables in jniLibs/arm64-v8a/ (.so trick) and shared libraries
+# Places executables in jniLibs/armeabi-v7a/ (.so trick) and shared libraries
 # in assets/usr/lib/ for first-run extraction.
 #
 # Compatible with bash 3.2+ (macOS default).
@@ -10,7 +10,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 ASSETS_DIR="$ROOT_DIR/android/app/src/main/assets"
-JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a"
 WORK_DIR="$ROOT_DIR/toolchains/termux-packages"
 
 # The index fetch, its signature check, package resolution and the digest check

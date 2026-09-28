@@ -4,7 +4,7 @@
     check-library-attribution.py
 
 Every shared library under `assets/usr/lib` and every executable under
-`jniLibs/arm64-v8a` is redistributed inside the APK, and all of them arrive from
+`jniLibs/armeabi-v7a` is redistributed inside the APK, and all of them arrive from
 Termux or Alpine rather than from this repository. Permissive licences require
 their notice to travel with the binary; GPL and LGPL additionally require an
 offer of the corresponding source. Neither obligation is discharged by code, so
@@ -88,7 +88,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "android/app/src/main/assets"
 USR_LIB = ROOT / "android/app/src/main/assets/usr/lib"
-JNILIBS = ROOT / "android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS = ROOT / "android/app/src/main/jniLibs/armeabi-v7a"
 LEGAL_NOTICES = ROOT / "docs/LEGAL_NOTICES.md"
 # The second attribution document, and the one that says out loud that this
 # script guards it. Both are read for attribution; the copyleft source offer

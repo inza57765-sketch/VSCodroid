@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Fetches the Node.js runtime and installs it as jniLibs/arm64-v8a/libnode.so.
+# Fetches the Node.js runtime and installs it as jniLibs/armeabi-v7a/libnode.so.
 #
 #   ./scripts/download-node.sh
 #
@@ -25,11 +25,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a"
 WORK_DIR="$ROOT_DIR/toolchains/termux-packages"
 
 TERMUX_REPO="${TERMUX_MIRROR:-https://mirror.mwt.me/termux/main}"
-PACKAGES_URL="$TERMUX_REPO/dists/stable/main/binary-aarch64/Packages"
+PACKAGES_URL="$TERMUX_REPO/dists/stable/main/binary-arm/Packages"
 
 # nodejs-lts, not nodejs: the LTS package tracks the line VS Code targets, while
 # the plain one runs ahead of it. Check what a VS Code version wants with

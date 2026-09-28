@@ -17,8 +17,8 @@ import sys
 
 # e_machine values from the ELF spec. The tree also carries Windows PE addons for
 # extensions that never load here; those are skipped rather than flagged.
-AARCH64 = 0xB7
-MACHINES = {0x3E: "x86-64", AARCH64: "aarch64", 0x28: "arm", 0xF3: "riscv"}
+ARM = 0x28
+MACHINES = {0x3E: "x86-64", 0xB7: "aarch64", 0x28: "arm", 0xF3: "riscv"}
 
 # The paths VSCodroid loads by name. server.js:57 forks the first, rewrites the
 # second on every start, and the Search service execs into the third.
@@ -32,7 +32,7 @@ REQUIRED = [
     "extensions/ms-vscode.js-debug/src/extension.js",
     # Moved in 1.133: @vscode/ripgrep became @vscode/ripgrep-universal, which
     # ships one binary per platform instead of one per install.
-    "node_modules/@vscode/ripgrep-universal/bin/linux-arm64/rg",
+    "node_modules/@vscode/ripgrep-universal/bin/linux-arm/rg",
     # Code - OSS is MIT and this tree is redistributed inside every APK, so the
     # copyright notice has to travel with it. product.json names it too.
     # Presence is not enough here, the contents are read further down.
@@ -45,7 +45,7 @@ REQUIRED = [
     "ThirdPartyNotices.txt",
     # What patch 0010 exists to keep: upstream's .moduleignore strips the SDK
     # entry the extension's own exports map points at, and on device that
-    # surfaces as chat submit dying in ChatSessionsService. The android-arm64
+    # surfaces as chat submit dying in ChatSessionsService. The android-armv7
     # aliases built at runtime resolve into this file, so a tree without it
     # ships a Copilot that renders but cannot send.
     "extensions/copilot/node_modules/@github/copilot/sdk/index.js",
@@ -171,7 +171,7 @@ def main(tree):
     if found is not None:
         check(not found, "no vsda", "this is not an OSS tree")
 
-    # gulp's node-linux-arm64 task ships a GNU/Linux Node whose interpreter does
+    # gulp's node-linux-ARMv7 task ships a GNU/Linux Node whose interpreter does
     # not exist on Android. Nothing references it; the runtime uses
     # nativeLibraryDir/libnode.so. 92 MiB of dead weight in every APK.
     found = present(tree / "node", "node")
@@ -240,7 +240,7 @@ def main(tree):
             # Shorter than an ELF64 header is not "some other format this walk
             # should skip" -- nothing executable in this tree, PE addons included,
             # is under 64 bytes. Treating it as unrecognised is how a 3-byte rg
-            # reached the end as "ok 0 native binaries are aarch64".
+            # reached the end as "ok 0 native binaries are ARM 32-bit".
             if len(head) < 64:
                 check(False, f"{path.relative_to(tree)} is {len(head)} bytes",
                       "truncated: too short to be an executable of any format")
@@ -252,14 +252,14 @@ def main(tree):
             check(False, f"{path.relative_to(tree)} could not be read", str(e))
             continue
         checked += 1
-        if machine != AARCH64:
+        if machine != ARM:
             wrong.append((path.relative_to(tree), MACHINES.get(machine, hex(machine))))
 
     for rel, arch in wrong:
-        check(False, f"{rel} is {arch}, not aarch64", "build on an arm64 host")
+        check(False, f"{rel} is {arch}, not arm", "build on an ARMv7 host")
     if not checked:
         # Zero examined is not a pass. This printed "ok 0 native binaries are
-        # aarch64", which reads exactly like a clean verdict and is the same
+        # ARM 32-bit", which reads exactly like a clean verdict and is the same
         # nothing-was-checked-versus-everything-passed conflation the sibling
         # refuses an empty --dir sweep for. Reachable: on an assets-cache hit the
         # fetch and the addon build are both skipped while the tree is restored
@@ -267,7 +267,7 @@ def main(tree):
         check(False, "no native binaries found to check",
               "a server tree carries node-pty, the file watcher and ripgrep at least")
     elif not wrong:
-        check(True, f"{checked} native binaries are aarch64")
+        check(True, f"{checked} native binaries are arm")
 
     product_path = tree / "product.json"
     # exists() inside the try as well -- it stats, and product.json sits at the tree

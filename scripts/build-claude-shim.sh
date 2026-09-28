@@ -6,7 +6,7 @@ set -euo pipefail
 #
 #   ANDROID_NDK_HOME=... ./scripts/build-claude-shim.sh
 #
-# Output, both into jniLibs/arm64-v8a so the package manager extracts them with
+# Output, both into jniLibs/armeabi-v7a so the package manager extracts them with
 # the execute bit into nativeLibraryDir, the only directory this app may execve
 # from:
 #
@@ -29,11 +29,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-OUT_DIR="${OUT_DIR:-$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a}"
+OUT_DIR="${OUT_DIR:-$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a}"
 SHIM_OUT="$OUT_DIR/libseccomp-shim.so"
 LAUNCH_OUT="$OUT_DIR/libclaude-launch.so"
 
-TARGET=aarch64-linux-android
+TARGET=armv7a-linux-androideabi
 API=33
 
 echo "=== Claude Code seccomp shim ==="

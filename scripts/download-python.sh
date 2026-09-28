@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Download pre-compiled Python 3 + pip from Termux APT repo.
-# Places interpreter in jniLibs/arm64-v8a/ (.so trick), stdlib + pip in
+# Places interpreter in jniLibs/armeabi-v7a/ (.so trick), stdlib + pip in
 # assets/usr/lib/python3.12/, and new shared libs in assets/usr/lib/.
 #
 # Dependencies already provided by download-termux-tools.sh are NOT re-downloaded:
@@ -13,7 +13,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 ASSETS_DIR="$ROOT_DIR/android/app/src/main/assets"
-JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a"
+JNILIBS_DIR="$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a"
 WORK_DIR="$ROOT_DIR/toolchains/termux-packages"
 
 # The index fetch, its signature check, package resolution and the digest check

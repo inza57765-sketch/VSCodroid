@@ -29,7 +29,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-JNI_DIR="$ROOT_DIR/android/app/src/main/jniLibs/arm64-v8a"
+JNI_DIR="$ROOT_DIR/android/app/src/main/jniLibs/armeabi-v7a"
 WORK_DIR="$ROOT_DIR/toolchains/musl"
 
 # A branch Alpine still supports, and it has to be checked when it is changed:
@@ -49,7 +49,7 @@ WORK_DIR="$ROOT_DIR/toolchains/musl"
 #
 #     curl -s https://alpinelinux.org/releases.json   # branch_date, eol_date
 ALPINE_BRANCH="${ALPINE_BRANCH:-v3.23}"
-MIRROR="https://dl-cdn.alpinelinux.org/alpine/$ALPINE_BRANCH/main/aarch64"
+MIRROR="https://dl-cdn.alpinelinux.org/alpine/$ALPINE_BRANCH/main/armhf"
 
 # How stale a signed index may be, in days, matching the Termux side's default.
 #
@@ -293,11 +293,11 @@ fi
 # LD_LIBRARY_PATH, which was verified on device.
 rm -rf "$WORK_DIR/extract"
 mkdir -p "$WORK_DIR/extract"
-tar xzf "$APK" -C "$WORK_DIR/extract" lib/ld-musl-aarch64.so.1 2>/dev/null
+tar xzf "$APK" -C "$WORK_DIR/extract" lib/ld-musl-armhf.so.1 2>/dev/null
 
-SRC="$WORK_DIR/extract/lib/ld-musl-aarch64.so.1"
+SRC="$WORK_DIR/extract/lib/ld-musl-armhf.so.1"
 if [ ! -f "$SRC" ]; then
-    echo "  ERROR: lib/ld-musl-aarch64.so.1 is not in musl-$MUSL_VERSION.apk." >&2
+    echo "  ERROR: lib/ld-musl-armhf.so.1 is not in musl-$MUSL_VERSION.apk." >&2
     exit 1
 fi
 
@@ -305,7 +305,7 @@ fi
 # execute bit; that directory is the only one an app may execve from.
 cp "$SRC" "$JNI_DIR/libldmusl.so"
 chmod 755 "$JNI_DIR/libldmusl.so"
-echo "  installed : jniLibs/arm64-v8a/libldmusl.so ($(du -h "$JNI_DIR/libldmusl.so" | cut -f1))"
+echo "  installed : jniLibs/armeabi-v7a/libldmusl.so ($(du -h "$JNI_DIR/libldmusl.so" | cut -f1))"
 
 python3 "$SCRIPT_DIR/verify-android-elf.py" "$JNI_DIR/libldmusl.so"
 
