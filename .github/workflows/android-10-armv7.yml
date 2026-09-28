@@ -22,5 +22,53 @@ jobs:
 
       - name: Configure Android SDK
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager"
+          fi
+
+          if [ ! -x "$SDKMANAGER" ]; then
+            echo "sdkmanager introuvable"
+            find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f
+            exit 1
+          fi
+
+          SDK_DIR=$(dirname "$SDKMANAGER")
+          echo "$SDK_DIR" >> "$GITHUB_PATH"
+
+      - name: Check Android SDK
+        run: |
+          which sdkmanager
+          sdkmanager --version
+
+      - name: Accept Android SDK licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Install Android SDK
+        run: |
+          sdkmanager             "platform-tools"             "platforms;android-37"             "build-tools;37.0.0"             "ndk;27.2.12479018"
+
+      - name: Verify Android SDK
+        run: |
+          sdkmanager --list_installed
+          test -d "$ANDROID_HOME/ndk/27.2.12479018"
+
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+
+      - name: Show Gradle version
+        working-directory: android
+        run: ./gradlew --version
+
+      - name: Build ARMv7 APK
+        working-directory: android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSCodroid-Android10-ARMv7
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
