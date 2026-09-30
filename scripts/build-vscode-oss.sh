@@ -301,6 +301,13 @@ done
 elapsed $(( SECONDS - t0 ))
 du -sh node_modules remote/node_modules 2>/dev/null | sed 's/^/  /'
 
+step "Copilot dependencies (npm ci)"
+(
+    cd "$SRC/extensions/copilot"
+    npm ci --fetch-retries=5 --fetch-retry-mintimeout=10000 \
+           --fetch-retry-maxtimeout=120000 --prefer-offline
+)
+
 
 # Its own stage, and its position is load-bearing: after the Dependencies stage,
 # before Branding. Measured on the artifact rather than argued: with the strip
