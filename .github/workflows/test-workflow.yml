@@ -1,7 +1,9 @@
 name: Test workflow
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - android-10-armv7
 
 jobs:
   test:
