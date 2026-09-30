@@ -38,7 +38,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ${{ inputs.runner }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04-arm' }}
     timeout-minutes: 120
     outputs:
       version: ${{ steps.pin.outputs.version }}
