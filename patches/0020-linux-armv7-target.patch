@@ -15,7 +15,7 @@ index a40ff6f6..24767402 100644
 
  function nodejs(platform: string, arch: string): NodeJS.ReadWriteStream | undefined {
 +	if (platform === 'linux' && arch === 'arm') {
-+		return es.through();
++		return es.readArray([]);
 +	}
 
  	if (arch === 'alpine') {
