@@ -12,11 +12,11 @@ index a40ff6f6..24767402 100644
  	// multiple alpine images and moved to a better model (alpine as the platform)
 @@ -271,6 +272,9 @@ if (defaultNodeTask) {
  }
- 
+
  function nodejs(platform: string, arch: string): NodeJS.ReadWriteStream | undefined {
 +	if (platform === 'linux' && arch === 'arm') {
-+		arch = 'armv7l';
++		return es.through();
 +	}
- 
+
  	if (arch === 'alpine') {
  		platform = 'alpine';
