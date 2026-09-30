@@ -5,6 +5,9 @@ name: Build Code - OSS server
 # an hour. The tarball it publishes is what build.yml and release.yml then fetch,
 # so the expensive build happens when the version moves, not on every tag.
 on:
+  push:
+    branches:
+      - android-10-armv7
   workflow_dispatch:
     inputs:
       vscode_version:
