@@ -183,10 +183,24 @@ jobs:
 
       - name: Verify ARMv7 ELF binaries
         run: |
+          set +e
           python3 scripts/verify-android-elf.py \
             --dir android/app/src/main/jniLibs/armeabi-v7a \
             --lib-dir android/app/src/main/assets/usr/lib \
-            --lib-dir android/app/src/main/jniLibs/armeabi-v7a
+            --lib-dir android/app/src/main/jniLibs/armeabi-v7a 2>&1 | tee /tmp/elf-verify.log
+          status=${PIPESTATUS[0]}
+
+          echo "=== ARMv7 verification failures ==="
+          grep -E 'FAIL|rejected|binaries checked' /tmp/elf-verify.log || true
+
+          {
+            echo "## ARMv7 ELF verification"
+            echo '```text'
+            grep -E 'FAIL|rejected|binaries checked' /tmp/elf-verify.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit "$status"
 
       # --------------------------------------------------
       # 9. Vérifications du projet
