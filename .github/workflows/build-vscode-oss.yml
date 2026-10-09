@@ -143,6 +143,7 @@ jobs:
           VSCODE_COMMIT: ${{ steps.pin.outputs.commit }}
           WORK: ${{ runner.temp }}/codeoss
           ARCH: arm
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p "$WORK"
           bash scripts/build-vscode-oss.sh
